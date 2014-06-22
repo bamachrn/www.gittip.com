@@ -23,8 +23,8 @@ class TestHistory(Harness):
         team.set_take_for(bob, Decimal('1.00'), team)
         alice.set_tip_to(bob, Decimal('5.00'))
         for i in range(3):
-            Payday(self.db).run()
-        Payday(self.db).start()
+            Payday.start().run()
+        Payday.start()
         event = next(iter_payday_events(self.db, bob))
         assert event['event'] == 'payday-start'
         assert event['number'] == 2
