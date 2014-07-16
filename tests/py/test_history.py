@@ -2,6 +2,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from decimal import Decimal
 
+from mock import patch
+
 from gittip.billing.payday import Payday
 from gittip.testing import Harness
 from gittip.utils.history import iter_payday_events
@@ -22,8 +24,10 @@ class TestHistory(Harness):
         team.add_member(bob)
         team.set_take_for(bob, Decimal('1.00'), team)
         alice.set_tip_to(bob, Decimal('5.00'))
-        for i in range(3):
-            Payday.start().run()
+        with patch.object(Payday, 'fetch_card_holds') as fch:
+            fch.return_value = {}
+            for i in range(3):
+                Payday.start().run()
         Payday.start()
         event = next(iter_payday_events(self.db, bob))
         assert event['event'] == 'payday-start'
